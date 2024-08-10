@@ -118,26 +118,22 @@
         let gameAreaRect = document.getElementById('game-area').getBoundingClientRect();
         let animationFrameId;
 
+        let previousGreenRect = greenBox.getBoundingClientRect();
+
         function moveRedBox() {
             if (isGameOver) return;
 
             const greenRect = greenBox.getBoundingClientRect();
             const redRect = redBox.getBoundingClientRect();
 
-            const dx = greenRect.left - redRect.left;
-            const dy = greenRect.top - redRect.top;
-            const distance = Math.sqrt(dx * dx + dy * dy);
+            const dx = greenRect.left - previousGreenRect.left;
+            const dy = greenRect.top - previousGreenRect.top;
 
-            if (distance < 50) {
-                loseLife();
-            }
+            redBox.style.left = `${Math.max(0, Math.min(redRect.left + dx - gameAreaRect.left, gameAreaRect.width - redBox.clientWidth))}px`;
+            redBox.style.top = `${Math.max(0, Math.min(redRect.top + dy - gameAreaRect.top, gameAreaRect.height - redBox.clientHeight))}px`;
 
-            const ratio = 3 / distance;
-            const moveX = dx * ratio;
-            const moveY = dy * ratio;
-
-            redBox.style.left = `${Math.max(0, Math.min(redRect.left + moveX - gameAreaRect.left, gameAreaRect.width - redBox.clientWidth))}px`;
-            redBox.style.top = `${Math.max(0, Math.min(redRect.top + moveY - gameAreaRect.top, gameAreaRect.height - redBox.clientHeight))}px`;
+            // Update previous position of green box
+            previousGreenRect = greenRect;
 
             animationFrameId = requestAnimationFrame(moveRedBox);
         }
@@ -157,6 +153,7 @@
             greenBox.style.left = `0px`;
             redBox.style.top = `${gameAreaRect.height - 50}px`;
             redBox.style.left = `${gameAreaRect.width - 50}px`;
+            previousGreenRect = greenBox.getBoundingClientRect(); // Reset the tracking position
         }
 
         function endGame(message) {
@@ -196,7 +193,7 @@
         // Handle Dragging for Touch Devices
         greenBox.addEventListener('touchstart', function (e) {
             const touch = e.touches[0];
-            const shiftX = touch.clientX - greenBox.getBoundingClientRect().left;
+            const shiftX = touch.clientX - greenBox.getBoundingClient.left;
             const shiftY = touch.clientY - greenBox.getBoundingClientRect().top;
 
             function moveAt(pageX, pageY) {
